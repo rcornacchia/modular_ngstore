@@ -1,18 +1,39 @@
-import { Component } from '@angular/core';
-
-import { ApiService } from './shared';
-
-import '../style/app.scss';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Observable } from 'rxjs/Rx';
+import { Store } from '@ngrx/store';
+import { INCREMENT, DECREMENT, RESET } from './reducers/counter';
+import { AppState } from './store/AppState';
+import { UserService } from './app.service';
 
 @Component({
-  selector: 'my-app', // <my-app></my-app>
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+    selector: 'my-app',
+    template: `
+        <p *ngIf="todos">
+            <i>Todos: {{todos}}</i>
+        </p>
+        <counter></counter>
+        <counter2></counter2>
+        <ngrx-store-log-monitor toggleCommand="ctrl-h" positionCommand="ctrl-m"></ngrx-store-log-monitor>
+    `,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent {
-  url = 'https://github.com/preboot/angular2-webpack';
 
-  constructor(private api: ApiService) {
-    // Do something with api
-  }
+export class AppComponent {
+    counter$: Observable<number>;
+    user = '';
+    todos = ['hello', 'there'];
+
+    constructor(private store: Store<AppState>, userService: UserService) {
+        this.counter$ = store.select<number>('counter');
+        this.user = userService.userName;
+        this.todos = userService.todos;
+    }
+
+    increment() {
+        this.store.dispatch({ type: 'INCREMENT' });
+    }
+
+    decrement() {
+        this.store.dispatch({ type: 'DECREMENT' });
+    }
 }

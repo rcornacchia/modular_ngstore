@@ -1,33 +1,36 @@
 import { NgModule, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpModule } from '@angular/http';
-import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { AboutComponent } from './about/about.component';
-import { ApiService } from './shared';
-import { routing } from './app.routing';
-
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
+import { counter, counter2 } from './reducers/counter';
+import { store, globalReducer } from './MyStoreModule';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { StoreLogMonitorModule, useLogMonitor } from '@ngrx/store-log-monitor';
+import { CounterModule } from './counter/counter.module';
+import { CounterModule2 } from './counter2/counter2.module';
+import { UserService } from './app.service';
+import { Store, StoreModule, combineReducers } from '@ngrx/store';
 
 @NgModule({
   imports: [
     BrowserModule,
-    HttpModule,
-    FormsModule,
-    routing
+    CounterModule,
+    CounterModule2,
+    StoreModule.provideStore(counter2),
+    StoreDevtoolsModule.instrumentStore({
+      monitor: useLogMonitor({
+        visible: true,
+        position: 'right'
+      })
+    }),
+    StoreLogMonitorModule,
   ],
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    AboutComponent
-  ],
-  providers: [
-    ApiService
-  ],
+  declarations: [AppComponent],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
+
 export class AppModule {
   constructor(public appRef: ApplicationRef) {}
   hmrOnInit(store) {
